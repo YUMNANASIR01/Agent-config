@@ -6,4 +6,5 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "openai-agents>=0.0.14",
+    "rich>=14.0.0",
 ]

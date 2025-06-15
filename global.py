@@ -1,33 +1,28 @@
 import os
 from dotenv import load_dotenv
 from openai import AsyncOpenAI
-from agents import Agent, RunConfig,Runner, set_default_openai_api,set_tracing_disabled
-set_default_openai_api("chat_completions")
+from agents import Agent,Runner,set_tracing_disabled,set_default_openai_api,set_default_openai_client
+import rich
 
 load_dotenv()  # Yeh .env file ko load karega
 set_tracing_disabled(disabled=True)
+set_default_openai_api("chat_completions")
 
-OPENROUTER_API_KEY= os.getenv("OPENROUTER_API_KEY")
-
-if not OPENROUTER_API_KEY:
-    raise ValueError("OPENROUTER_API_KEY is not set")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 # ---------------------------------------------------------------------
+client = AsyncOpenAI(
+    api_key = GEMINI_API_KEY,
+    base_url = "https://generativelanguage.googleapis.com/v1beta/openai/",
+)
+set_default_openai_client(client)
 
-
-
-
+# -------------------------------------------------------------------
 agent= Agent(
     name= "Yumna",
     instructions= "you are a helpful assistant",
+    model = "gemini-2.0-flash",
 )
 # -------------------------------------------------------------
 
-client = AsyncOpenAI(
-    api_key = OPENROUTER_API_KEY,
-    base_url = "https://openrouter.ai/api/v1",
-)
-
-set_default_openai_client(client)
-
-jawab =  Runner.run(agent, "What is your name?")
-print(jawab.final_output)
+res = Runner.run_sync(agent, "Hello?")
+rich.print(res.final_output)
